@@ -27,6 +27,10 @@ app.get(errorHandller);
 app.post("/addMovie", addMovie);
 app.get("/getMovies", getMovieHandler);
 
+app.get("getMovie/:id", favMovieHandler);
+app.put("/update/:id", updateHandler);
+app.delete("/delete/:id", deleteHandler);
+
 function handler(req, res) {
     let arr = [];
     let onemovie = new movie(value.id, value.title, value.release_date, value.poster_path, value.overview)
@@ -108,6 +112,50 @@ function getMovieHandler(req, res) {
     }).catch((error) => {
         errorHandler(error, req, res);
     });
+};
+
+function favMovieHandler(req, res) {
+    let id = req.params.id;
+
+    const sql = 'SELECT * FROM movie WHERE id=$1;';
+    const values = [id];
+
+    client.query(sql, values).then((result) => {
+        return res.status(200).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res)
+    })
+};
+
+
+function updateHandler(req, res) {
+    const id = req.params.id;
+    const addmov= req.body;
+
+    const sql = 'UPDATE movie SET title=$1,release_date=$2 ,poster_path=$3 ,overview=$4  WHERE id=$5 RETURNING *;';
+    const values = [addMov.title, addmov.title, addmov.release_date, addmov.poster_path, addmov.overview, id];
+
+    client.query(sql, values).then((result) => {
+        return res.status(200).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res);
+    })
+
+};
+
+
+
+function deleteHandler(req, res) {
+    const id = req.params.id
+
+    const sql = 'DELETE FROM movie WHERE id=$1;';
+    const values = [id];
+
+    client.query(sql, values).then(() => {
+        return res.status(204).json({})
+    }).catch(error => {
+        errorHandler(error, req, res);
+    })
 };
 
 
