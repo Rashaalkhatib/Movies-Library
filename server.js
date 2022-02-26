@@ -8,8 +8,10 @@ const app = express();
 
 
 const DATABASE_URL = process.'postgres://rasha:318020@localhost:5432/movies';
-const client = new pg.Client(DATABASE_URL);
-
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 function movie(id, title, release_date, poster_path, overview) {
     this.id= id;
